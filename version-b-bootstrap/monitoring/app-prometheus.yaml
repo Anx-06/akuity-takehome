@@ -1,0 +1,28 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: prometheus
+  namespace: argocd
+spec:
+  project: default
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: monitoring
+  source:
+    repoURL: https://charts.bitnami.com/bitnami
+    chart: prometheus
+    targetRevision: "*"   # latest chart; you can pin later
+    helm:
+      values: |
+        server:
+          extraFlags:
+            - web.enable-lifecycle
+        extraScrapeConfigs:
+          - job_name: "argocd"
+            metrics_path: /metrics
+            static_configs:
+              - targets:
+                  - argocd-server-metrics.argocd.svc.cluster.local:8083
+                  - argocd-repo-server.argocd.svc.cluster.local:8084
+                  - argocd-notifications-controller-metrics.argocd.svc.cluster.local:9001
+                  - argocd-application-controller-metrics.argocd.svc.cluster.local:8082
