@@ -8,22 +8,28 @@ spec:
   destination:
     server: https://kubernetes.default.svc
     namespace: monitoring
-source:
-  repoURL: https://charts.bitnami.com/bitnami
-  chart: prometheus
-  targetRevision: "*"
-  helm:
-    values: |
-      server:
-        extraFlags:
-          - web.enable-lifecycle
-        extraScrapeConfigs:
-          - job_name: "argocd"
-            metrics_path: /metrics
-            static_configs:
-              - targets:
-                  - argocd-server-metrics.argocd.svc.cluster.local:8083
-                  - argocd-repo-server.argocd.svc.cluster.local:8084
-                  - argocd-notifications-controller-metrics.argocd.svc.cluster.local:9001
-                  - argocd-application-controller-metrics.argocd.svc.cluster.local:8082
-
+  source:
+    repoURL: https://charts.bitnami.com/bitnami
+    chart: prometheus
+    targetRevision: "*"
+    helm:
+      values: |
+        server:
+          extraFlags:
+            - web.enable-lifecycle
+          extraScrapeConfigs:
+            - job_name: "argocd"
+              metrics_path: /metrics
+              static_configs:
+                - targets:
+                    - argocd-server-metrics.argocd.svc.cluster.local:8083
+                    - argocd-repo-server.argocd.svc.cluster.local:8084
+                    - argocd-notifications-controller-metrics.argocd.svc.cluster.local:9001
+                    - argocd-metrics.argocd.svc.cluster.local:8082
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+YAML
